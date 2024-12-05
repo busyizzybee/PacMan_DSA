@@ -14,7 +14,7 @@ import javax.swing.Timer;
 
 public class Model extends JPanel implements ActionListener {
 
-	private Dimension d;
+    private Dimension d;
     private final Font smallFont = new Font("Arial", Font.BOLD, 16);
     private boolean inGame = false;
     private boolean dying = false;
@@ -50,6 +50,93 @@ public class Model extends JPanel implements ActionListener {
     private int currentSpeed = 3;
     private short[] screenData;
     Timer timer;
+
+    private void loadImages() {
+   	down = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//down.gif").getImage();
+   	up = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//up.gif").getImage();
+   	left = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//left.gif").getImage();
+   	right = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//right.gif").getImage();
+       ghost = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//ghost.gif").getImage();
+       blueghost =  new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//blueghost.gif").getImage();
+       cherry =  new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//CherryShadow.png").getImage();
+       heart = new ImageIcon("C://Users//Robert//Downloads//pacman-main//pacman-main//images//heart.png").getImage();
+   }
+
+ private void drawGhost(Graphics2D g2d, int x, int y, boolean isVulnerable) {
+       if (isVulnerable) {
+           g2d.drawImage(blueghost, x + 5, y + 5, this);
+       } else {
+           g2d.drawImage(ghost, x + 5, y + 5, this);
+       }
+   }
+  
+   private void drawFruit(Graphics2D g2d, int x, int y) {
+   	g2d.drawImage(cherry, x + 5, y + 5, this);
+   }
+
+  private void drawPacman(Graphics2D g2d) {
+       if (req_dx == -1) {
+       	g2d.drawImage(left, pacman_x + 7, pacman_y + 6, this);
+       } else if (req_dx == 1) {
+       	g2d.drawImage(right, pacman_x + 7, pacman_y + 6, this);
+       } else if (req_dy == -1) {
+       	g2d.drawImage(up, pacman_x + 7, pacman_y + 6, this);
+       } else {
+       	g2d.drawImage(down, pacman_x + 7, pacman_y + 6, this);
+       }
+   }
+
+public void paintComponent(Graphics g) {
+       super.paintComponent(g);
+       Graphics2D g2d = (Graphics2D) g;
+       g2d.setColor(Color.black);
+       g2d.fillRect(0, 0, d.width, d.height);
+       drawMaze(g2d);
+       drawScore(g2d);
+       if (paused) {
+           showPausedScreen(g2d); // Show paused screen if paused
+       }
+       else if(isWin) {
+       	showPausedScreen(g2d);
+       }
+       else if(!isWin) {
+       	inGame = true;
+           playGame(g2d);
+       }
+       else if(isDead) {
+       	showPausedScreen(g2d);
+       }
+       else if(!isDead) {
+       	inGame = true;
+           playGame(g2d);
+       }
+       else if (inGame)
+       {
+       	inGame = true;
+           playGame(g2d);
+       } else if (!inGame) {
+       	inGame = true;
+           playGame(g2d);
+       } 
+       Toolkit.getDefaultToolkit().sync();
+       g2d.dispose();
+   }
+
+   private void showPausedScreen(Graphics2D g2d) {
+       String pausedMessage = "";
+       g2d.setColor(Color.YELLOW);
+       g2d.setFont(smallFont);
+       FontMetrics fm = g2d.getFontMetrics();
+       int messageWidth = fm.stringWidth(pausedMessage);
+       g2d.drawString(pausedMessage, (SCREEN_SIZE - messageWidth) / 2, SCREEN_SIZE / 2);
+   }
+
+
+
+
+
+
+
 
     public Model() {
         loadImages();
