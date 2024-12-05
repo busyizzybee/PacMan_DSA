@@ -164,6 +164,105 @@ public void paintComponent(Graphics g) {
     
     
     //----Ate Raven Start----//
+private final short levelData[]= { 	
+   	    19, 26, 26, 26, 18, 26, 26, 26, 22,  0, 19, 26, 26, 26, 18, 26, 26, 26, 22,
+   	    21,  0,  0,  0, 69,  0,  0,  0, 21,  0, 21,  0,  0,  0, 21,  0,  0,  0, 21,
+   	    21,  0,  0,  0, 21,  0,  0,  0, 21,  0, 21,  0,  0,  0, 37,  0,  0,  0, 21,
+   	    17, 26, 26, 18, 24, 26, 26, 26, 24, 26, 24, 26, 26, 26, 24, 18, 26, 26, 20,
+   	    21,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0, 21,
+   	    25, 26, 26, 16, 26, 26, 26, 26, 22,  0, 19, 26, 26, 26, 26, 16, 26, 26, 28,
+   	     0,  0,  0, 21,  0,  0,  0,  0, 21,  0, 21,  0,  0,  0,  0, 21,  0,  0,  0,
+   	     0,  0,  0, 21,  0, 19, 26, 26, 24, 18, 24, 26, 26, 22,  0, 21,  0,  0,  0,
+   	     0,  0,  0, 21,  0, 21,  0,  0,  0,  5,  0,  0,  0, 21,  0, 21,  0,  0,  0,
+   	    27, 26, 26, 16, 26, 20,  0, 11, 10,  8, 10, 14,  0, 17, 26, 16, 26, 42, 30,
+   	     0,  0,  0, 21,  0, 21,  0,  0,  0,  0,  0,  0,  0, 21,  0, 21,  0,  0,  0,
+   	     0,  0,  0, 21,  0, 25, 26, 26, 26, 26, 26, 26, 26, 28,  0, 21,  0,  0,  0,
+   	     0,  0,  0, 21,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 21,  0,  0,  0,
+   	    19, 26, 26, 16, 26, 26, 26, 26, 22,  0, 19, 26, 26, 26, 26, 16, 26, 26, 22,
+   	    21,  0,  0, 21,  0,  0,  0,  0, 21,  0, 21,  0,  0,  0,  0, 21,  0,  0, 21,
+   	    25, 22,  0, 21,  0, 19, 26, 18, 16, 10, 16, 18, 26, 22,  0, 21,  0, 19, 28,
+   	     0, 21,  0, 17, 26, 28,  0, 25, 20,  0, 17, 28,  0, 25, 26, 20,  0, 21,  0,
+   	     0, 21,  0, 21,  0,  0,  0,  0, 21,  0, 21,  0,  0,  0,  0, 21,  0, 69,  0,
+   	    27, 24, 42, 24, 26, 26, 26, 26, 24, 26, 24, 26, 26, 26, 26, 24, 26, 24, 30
+   	};
+
+  private void checkMaze(Graphics2D g2d) {
+       if (isWin) {
+           return; // Exit if the game is already won
+       }
+       int i = 0;
+       boolean finished = true;
+       while (i < N_BLOCKS * N_BLOCKS && finished) {
+           if ((screenData[i] & 16) != 0) {
+               finished = false;
+           }
+           i++;
+       }
+       if (finished) {
+       	showPausedScreen(g2d);
+       	timer.stop();
+           isWin = true;
+           Win win = new Win(Model.this);
+           win.setVisible(true);
+           score += 50;
+           if (N_GHOSTS < MAX_GHOSTS) {
+               N_GHOSTS++;
+           }
+           if (currentSpeed < maxSpeed) {
+               currentSpeed++;
+           }
+           initLevel();
+          
+       }
+   }
+
+private void drawMaze(Graphics2D g2d) {
+       short i=0;
+       int x, y;
+       for (y = 0; y < SCREEN_SIZE; y += BLOCK_SIZE) {
+           for (x = 0; x < SCREEN_SIZE; x += BLOCK_SIZE) {
+               g2d.setColor(new Color(0,72,251));
+               g2d.setStroke(new BasicStroke(5));
+              
+               if ((levelData[i] == 0)) {
+               	g2d.setColor(new Color(0,0,0));
+               	g2d.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE);
+                }
+               if ((screenData[i] & 1) != 0) {
+                   g2d.drawLine(x, y, x, y + BLOCK_SIZE - 3);
+               }
+               if ((screenData[i] & 2) != 0) {
+                   g2d.drawLine(x, y, x + BLOCK_SIZE - 3  , y);
+               }
+               if ((screenData[i] & 4) != 0) {
+                   g2d.drawLine(x + BLOCK_SIZE - 3, y, x + BLOCK_SIZE - 3,
+                           y + BLOCK_SIZE - 3);
+               }
+               if ((screenData[i] & 8) != 0) {
+                   g2d.drawLine(x, y + BLOCK_SIZE - 3, x + BLOCK_SIZE - 3,
+                           y + BLOCK_SIZE - 3);
+               }
+               if ((screenData[i] & 16) != 0) {
+                   g2d.setColor(new Color(255,255,255));
+                   g2d.fillOval(x + 13, y + 13, 6, 6);
+              }
+              
+               if((screenData[i] & 32) !=0) {
+               	g2d.setColor(new Color(255,255,255));
+                   g2d.fillOval(x + 9, y + 9, 16, 16);
+                  
+               }
+               if((screenData[i] & 64) !=0) {
+               	drawFruit(g2d, x + 1 , y + 2);
+                  
+               }
+              
+              
+               i++;
+           }
+       }
+   }
+
 
     //----Ate Raven End----------//
     
