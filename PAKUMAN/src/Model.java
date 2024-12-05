@@ -92,10 +92,125 @@ public class Model extends JPanel implements ActionListener {
     //----Robert End----------//
     
     
-    
-    //----Kishi Start---//
 
-    //----Kishi End----------//
+	private void death(Graphics2D g2d) {
+	   	lives--;
+	       if (lives == 0) {
+	       	showPausedScreen(g2d);
+	       	timer.stop();
+	           isDead = true;
+	           GameOver over = new GameOver(Model.this);
+	           over.setVisible(true);
+	          
+	          
+	       }
+	       continueLevel();
+	   }
+
+	private void movePacman() {
+	       int pos;
+	       short ch;
+	       if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
+	           pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
+	           ch = screenData[pos];
+	           if ((ch & 16) != 0) {
+	               screenData[pos] = (short) (ch & 15);
+	               score += 10;
+	              
+	           } else if ((ch & 32) != 0) {
+	               score += 100;
+	               currentSpeed = 1;
+	               screenData[pos] = (short) (ch & 31);
+	               for (int i = 0; i < N_GHOSTS; i++) {
+	               	currentSpeed = 1;
+	               	
+	                   ghostVulnerable[i] = true;
+	               }
+	               ghostsVulnerable = true;
+	               vulnerableStartTime = System.currentTimeMillis();
+	              
+	           } else if ((ch & 64) != 0) {
+	               screenData[pos] = (short) (ch & 63);
+	               score += 50;
+	               PACMAN_SPEED = 6;
+	               speedStartTime = System.currentTimeMillis();
+	               speedTime = true;
+	           }
+	           if (req_dx != 0 || req_dy != 0) {
+	               if (!((req_dx == -1 && req_dy == 0 && (ch & 1) != 0)
+	                       || (req_dx == 1 && req_dy == 0 && (ch & 4) != 0)
+	                       || (req_dx == 0 && req_dy == -1 && (ch & 2) != 0)
+	                       || (req_dx == 0 && req_dy == 1 && (ch & 8) != 0))) {
+	                   pacmand_x = req_dx;
+	                   pacmand_y = req_dy;
+	               }
+	           }
+	           if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
+	                   || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
+	                   || (pacmand_x == 0 && pacmand_y == -1 && (ch & 2) != 0)
+	                   || (pacmand_x == 0 && pacmand_y == 1 && (ch & 8) != 0)) {
+	               pacmand_x = 0;
+	               pacmand_y = 0;
+	           }
+	       }
+	       pacman_x += PACMAN_SPEED * pacmand_x;
+	       pacman_y += PACMAN_SPEED * pacmand_y;
+	       if (pacman_x < 0) pacman_x = 0;
+	       if (pacman_x >= SCREEN_SIZE) pacman_x = SCREEN_SIZE - 1;
+	       if (pacman_y < 0) pacman_y = 0;
+	       if (pacman_y >= SCREEN_SIZE) pacman_y = SCREEN_SIZE - 1;
+	}
+
+	private void resetGhost(int ghostIndex) {
+	       ghost_x[ghostIndex] = (N_BLOCKS / 2) * BLOCK_SIZE;
+	       ghost_y[ghostIndex] = (N_BLOCKS / 2) * BLOCK_SIZE;
+	       ghostVulnerable[ghostIndex] = false;
+	}
+
+	class TAdapter extends KeyAdapter {
+	       @Override
+	       public void keyPressed(KeyEvent e) {
+	           int key = e.getKeyCode();
+	           if (inGame) {
+	               if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_A) {
+	                   req_dx = -1;
+	                   req_dy = 0;
+	               } else if (key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_D) {
+	                   req_dx = 1;
+	                   req_dy = 0;
+	               } else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
+	                   req_dx = 0;
+	                   req_dy = -1;
+	               } else if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
+	                   req_dx = 0;
+	                   req_dy = 1;
+	               } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
+	                   inGame = false;
+	               } else if (key == KeyEvent.VK_P) {
+	                   if (paused) {
+	                       paused = false;
+	                       timer.start();
+	                   } else {
+	                       paused = true;
+	                       timer.stop();
+	                       Pause pausePanel = new Pause(Model.this);
+	                       pausePanel.setVisible(true);
+	                   }
+	               }
+	           } else {
+	               if (key == KeyEvent.VK_SPACE) {
+	                   inGame = true;
+	                   initGame();
+	               } else if (key == KeyEvent.VK_ESCAPE) {
+	                   Pacman pac = new Pacman();
+	                   setVisible(false);
+	                   MainMenu menu = new MainMenu();
+	                   menu.setVisible(true);
+	               }
+	           }
+	       }
+	   }
+
     
     
     
